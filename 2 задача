@@ -1,0 +1,90 @@
+from sys import *
+from math import *
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget,
+                             QVBoxLayout, QHBoxLayout, QLabel,
+                             QLineEdit, QPushButton)
+
+
+class HarmonicApp(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("График гармонического колебания")
+        self.setFixedSize(800, 600)
+
+        a = QWidget()
+        self.setCentralWidget(a)
+        b = QVBoxLayout()
+        a.setLayout(b)
+        c = QHBoxLayout()
+        d = QVBoxLayout()
+        e = QLabel("Амплитуда, м:")
+
+        self.f = QLineEdit("1.0")
+        d.addWidget(e)
+        d.addWidget(self.f)
+        g = QVBoxLayout()
+        h = QLabel("Частота, Гц:")
+
+        self.i = QLineEdit("1.0")
+        g.addWidget(h)
+        g.addWidget(self.i)
+        j = QVBoxLayout()
+        k = QLabel("Фаза, градусы:")
+
+        self.l = QLineEdit("0")
+        j.addWidget(k)
+        j.addWidget(self.l)
+
+        c.addLayout(d)
+        c.addLayout(g)
+        c.addLayout(j)
+
+        self.m = QPushButton("Построить график")
+        self.m.clicked.connect(self.draw_graph)
+
+        self.o, self.p = plt.subplots()
+        self.q = FigureCanvas(self.o)
+
+        b.addLayout(c)
+        b.addWidget(self.m)
+        b.addWidget(self.q)
+        self.draw_graph()
+
+    def draw_graph(self):
+        try:
+            r = float(self.f.text())
+            s = float(self.i.text())
+            t = float(self.l.text())
+
+            u = radians(t)
+
+            v = [w * 0.01 for w in range(201)]
+            x = []
+            for y in v:
+                z = r * sin(2 * pi * s * y + u)
+                x.append(z)
+
+            self.p.clear()
+            self.p.plot(v, x, 'b-', linewidth=2)
+            self.p.set_xlabel('Время, с', fontsize=10)
+            self.p.set_ylabel('Смещение, м', fontsize=10)
+            self.p.set_title('График гармонического колебания', fontsize=12)
+            self.p.grid(True, linestyle='--', alpha=0.7)
+            self.q.draw()
+
+        except ValueError:
+            self.p.clear()
+            self.p.text(0.5, 0.5, '404 проверьте данные, которые вы ввели',
+                       horizontalalignment='center',
+                       verticalalignment='center',
+                       transform=self.p.transAxes)
+            self.q.draw()
+
+
+if __name__ == "__main__":
+    app = QApplication(argv)
+    window = HarmonicApp()
+    window.show()
+    sys.exit(app.exec_())
