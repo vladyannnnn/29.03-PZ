@@ -1,0 +1,93 @@
+from sys import *
+from math import *
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget,
+                             QVBoxLayout, QHBoxLayout, QLabel,
+                             QLineEdit, QPushButton)
+
+
+class PhysicsApp(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Траектория полета тела")
+        self.setFixedSize(800, 600)
+
+        main_widget = QWidget()
+        self.setCentralWidget(main_widget)
+        main_layout = QVBoxLayout()
+        main_widget.setLayout(main_layout)
+        input_layout = QHBoxLayout()
+
+        speed_layout = QVBoxLayout()
+        speed_label = QLabel("Начальная скорость, м/с:")
+        self.a = QLineEdit()
+        self.a.setText("10")
+        speed_layout.addWidget(speed_label)
+        speed_layout.addWidget(self.a)
+
+        angle_layout = QVBoxLayout()
+        angle_label = QLabel("Угол броска, градусы:")
+        self.b = QLineEdit()
+        self.b.setText("45")
+        angle_layout.addWidget(angle_label)
+        angle_layout.addWidget(self.b)
+
+        input_layout.addLayout(speed_layout)
+        input_layout.addLayout(angle_layout)
+
+        self.c = QPushButton("Построить траекторию")
+        self.c.clicked.connect(self.d)
+
+        self.e, self.f = plt.subplots()
+        self.g = FigureCanvas(self.e)
+
+        main_layout.addLayout(input_layout)
+        main_layout.addWidget(self.c)
+        main_layout.addWidget(self.g)
+
+
+    def d(self):
+        try:
+            h = float(self.a.text())
+            i = float(self.a.text())
+            j = radians(i)
+            g=9.81
+
+            k = 2 * h * sin(j) / g
+
+            l = []
+            m = 0
+            while m <= k:
+                l.append(m)
+                m += 0.01
+
+            n = []
+            o = []
+            for p in l:
+                q = h * cos(j) * p
+                r = h * sin(j) * p - 0.5 * g * p ** 2
+                n.append(q)
+                o.append(r)
+
+            self.f.clear()
+            self.f.plot(n, o, 'b-')
+            self.f.set_xlabel('Расстояние, м')
+            self.f.set_ylabel('Высота, м')
+            self.f.set_title('Траектория полета тела')
+            self.f.grid(True)
+
+            self.g.draw()
+
+        except ValueError:
+            self.f.clear()
+            self.f.text(0.5, 0.5, '404 введите числа в поле ввода',
+                         ha='center', va='center')
+            self.g.draw()
+
+
+if __name__ == "__main__":
+    app = QApplication(argv)
+    window = PhysicsApp()
+    window.show()
+    exit(app.exec_())
