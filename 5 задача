@@ -1,0 +1,84 @@
+from sys import *
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, HBoxLayout, QLabel, QLineEdit, QPushButton,QComboBox)
+from PyQt5.QtCore import Qt
+
+class GasLawApp(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Закон Бойля-Мариотта")
+        self.setFixedSize(800, 600)
+
+        a = QWidget()
+        self.setCentralWidget(a)
+        b = QVBoxLayout()
+        a.setLayout(b)
+
+        c = QHBoxLayout()
+        d = QVBoxLayout()
+        e = QLabel("Температура, К:")
+        self.f = QLineEdit("300")
+        d.addWidget(e)
+        d.addWidget(self.f)
+
+        g = QVBoxLayout()
+        h = QLabel("Количество вещества, моль:")
+        self.i = QLineEdit("1")
+        g.addWidget(h)
+        g.addWidget(self.i)
+
+        j = QVBoxLayout()
+        k = QLabel("Единицы давления:")
+        self.l = QComboBox()
+        self.l.addItems(["Па", "атм"])
+        j.addWidget(k)
+        j.addWidget(self.l)
+
+        c.addLayout(d)
+        c.addLayout(g)
+        c.addLayout(j)
+
+        self.m = QPushButton("Построить график")
+        self.m.clicked.connect(self.plot_graph)
+
+        self.n, self.o = plt.subplots()
+        self.p = FigureCanvas(self.n)
+        b.addLayout(c)
+        b.addWidget(self.m)
+        b.addWidget(self.p)
+        self.R = 8.314
+
+    def plot_graph(self):
+        try:
+            q = float(self.f.text())
+            r = float(self.i.text())
+            s = self.l.currentText()
+            if q <= 0 or r <= 0:
+                raise ValueError("Значения должны быть положительными")
+            V = [v * 0.1 for v in range(1, 101)]
+            P = []
+            for V_val in V:
+                P_val = r * self.R * q / V_val
+                if s == "атм":
+                    P_val = P_val / 101325
+                P.append(P_val)
+            self.o.clear()
+            self.o.plot(V, P, 'g-')
+            self.o.set_xlabel('Объём, м³')
+            self.o.set_ylabel(f'Давление ({s})')
+            self.o.set_title('Зависимость давления от объёма (P-V диаграмма)')
+            self.o.grid(True)
+            self.p.draw()
+        except ValueError as e:
+            self.o.clear()
+            y = str(e) if str(e) else "404 проверьте введенные данные"
+            self.o.text(0.5, 0.5, y,
+                       ha='center', va='center')
+            self.p.draw()
+
+if __name__ == "__main__":
+    app = QApplication(argv)
+    window = GasLawApp()
+    window.show()
+    sys.exit(app.exec_())
